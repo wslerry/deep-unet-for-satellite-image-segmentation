@@ -1,7 +1,9 @@
 # u-net model with up-convolution or up-sampling and weighted binary-crossentropy as loss func
 
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Conv2DTranspose, BatchNormalization, Dropout
+from tensorflow.keras.layers import (Input, Conv2D, MaxPooling2D, 
+                                     UpSampling2D, concatenate, Conv2DTranspose, 
+                                     BatchNormalization, Dropout)
 from tensorflow.keras.optimizers import Adam #edit to old keras
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras import backend as K
