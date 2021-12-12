@@ -20,12 +20,12 @@ def normalize(img):
 N_BANDS = 8
 N_CLASSES = 5  # buildings, roads, trees, crops and water
 CLASS_WEIGHTS = [0.2, 0.3, 0.1, 0.1, 0.3]
-N_EPOCHS = 150
+N_EPOCHS = 100
 UPCONV = True
 PATCH_SZ = 160   # should divide by 16
 BATCH_SIZE = 150
-TRAIN_SZ = 1000  # train size 4000
-VAL_SZ = 500    # validation size 2000
+TRAIN_SZ = 500  # train size 4000
+VAL_SZ = 250    # validation size 2000
 
 
 def get_model():
