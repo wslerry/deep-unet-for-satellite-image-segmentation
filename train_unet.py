@@ -89,7 +89,7 @@ if __name__ == '__main__':
         X_DICT_VALIDATION[img_id] = img_m[train_xsz:, :, :]
         Y_DICT_VALIDATION[img_id] = mask[train_xsz:, :, :]
         print('*', end="", flush=True)
-    print('[INFO] Images were read')
+    print('\n[INFO] Images were read')
 
     def train_net():
         print("[INFO] Start train UNET")
