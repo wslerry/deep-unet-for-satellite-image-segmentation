@@ -24,7 +24,7 @@ N_EPOCHS = 150
 UPCONV = True
 PATCH_SZ = 160   # should divide by 16
 BATCH_SIZE = 150
-TRAIN_SZ = 4000  # train size
+TRAIN_SZ = 2500  # train size
 VAL_SZ = 1000    # validation size
 
 
