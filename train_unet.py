@@ -3,10 +3,12 @@ from gen_patches import *
 
 import os.path
 import numpy as np
+import argparse
 import tifffile as tiff
 from tensorflow.keras.callbacks import CSVLogger
 from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras import backend as K
 
 
 def normalize(img):
@@ -20,12 +22,12 @@ def normalize(img):
 N_BANDS = 8
 N_CLASSES = 5  # buildings, roads, trees, crops and water
 CLASS_WEIGHTS = [0.2, 0.3, 0.1, 0.1, 0.3]
-N_EPOCHS = 100
+# N_EPOCHS = 200
 UPCONV = True
 PATCH_SZ = 160   # should divide by 16
-BATCH_SIZE = 32
-TRAIN_SZ = 500  # train size 4000
-VAL_SZ = 250    # validation size 2000
+# BATCH_SIZE = 32
+TRAIN_SZ = 4000  # train size 4000
+VAL_SZ = 2000    # validation size 2000
 
 
 def get_model():
@@ -41,27 +43,51 @@ trainIds = [str(i).zfill(2) for i in range(1, 25)]  # all availiable ids: from "
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--images', 
+                        type=str,
+                        default='./data/mband',
+                        help='Folder directory for train images')
+    parser.add_argument('--mask', 
+                        type=str,
+                        default='./data/gt_mband',
+                        help='Folder directory for mask images')
+    parser.add_argument('-e','--epochs', 
+                        type=str,
+                        default=200,
+                        help='Epoch to run training network')
+    parser.add_argument('-b','--batch', 
+                        type=str,
+                        default=32,
+                        help='Batch size for training network')
+    opt = parser.parse_args()
+    print(opt)
+    
+    N_EPOCHS = opt.epochs
+    BATCH_SIZE = opt.batch
+    
     X_DICT_TRAIN = dict()
     Y_DICT_TRAIN = dict()
     X_DICT_VALIDATION = dict()
     Y_DICT_VALIDATION = dict()
 
-    print('Reading images')
+    print('[INFO] Reading images')
     for img_id in trainIds:
-        img_m = normalize(tiff.imread('./data/mband/{}.tif'.format(img_id)).transpose([1, 2, 0]))
-        mask = tiff.imread('./data/gt_mband/{}.tif'.format(img_id)).transpose([1, 2, 0]) / 255
+        img_m = normalize(tiff.imread('{}/{}.tif'.format(opt.images,img_id)).transpose([1, 2, 0]))
+        mask = tiff.imread('{}/{}.tif'.format(opt.mask,img_id)).transpose([1, 2, 0]) / 255
         train_xsz = int(3/4 * img_m.shape[0])  # use 75% of image as train and 25% for validation
         X_DICT_TRAIN[img_id] = img_m[:train_xsz, :, :]
         Y_DICT_TRAIN[img_id] = mask[:train_xsz, :, :]
         X_DICT_VALIDATION[img_id] = img_m[train_xsz:, :, :]
         Y_DICT_VALIDATION[img_id] = mask[train_xsz:, :, :]
-        print(img_id + ' read')
-    print('Images were read')
+        print('*', end="", flush=True)
+    print('[INFO] Images were read')
 
     def train_net():
-        print("start train net")
+        print("[INFO] Start train UNET")
         x_train, y_train = get_patches(X_DICT_TRAIN, Y_DICT_TRAIN, n_patches=TRAIN_SZ, sz=PATCH_SZ)
         x_val, y_val = get_patches(X_DICT_VALIDATION, Y_DICT_VALIDATION, n_patches=VAL_SZ, sz=PATCH_SZ)
+        K.clear_session()
         model = get_model()
         if os.path.isfile(weights_path):
             model.load_weights(weights_path)

@@ -2,8 +2,22 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 import tifffile as tiff
+import argparse
 
 from train_unet import weights_path, get_model, normalize, PATCH_SZ, N_CLASSES
+
+
+def CheckExt(choices):
+    class Act(argparse.Action):
+        def __call__(self,parser,namespace,fname,option_string=None):
+            ext = os.path.splitext(fname)[1][1:]
+            if ext not in choices:
+                option_string = '({})'.format(option_string) if option_string else ''
+                parser.error("[ERROR!] file extesion doesn't end with one of {}{}".format(choices,option_string))
+            else:
+                setattr(namespace,self.dest,fname)
+
+    return Act
 
 
 def predict(x, model, patch_sz=160, n_classes=5):
@@ -47,17 +61,20 @@ def predict(x, model, patch_sz=160, n_classes=5):
 def picture_from_mask(mask, threshold=0):
     colors = {
         0: [150, 150, 150],  # Buildings
-        1: [223, 194, 125],  # Roads & Tracks
-        2: [27, 120, 55],    # Trees
-        3: [166, 219, 160],  # Crops
-        4: [116, 173, 209]   # Water
+        # 1: [223, 194, 125],  # Roads & Tracks
+        # 2: [27, 120, 55],    # Trees
+        # 3: [166, 219, 160],  # Crops
+        # 4: [116, 173, 209]   # Water
     }
+    # z_order = {
+    #     1: 3,
+    #     2: 4,
+    #     3: 0,
+    #     4: 1,
+    #     5: 2
+    # }
     z_order = {
-        1: 3,
-        2: 4,
-        3: 0,
-        4: 1,
-        5: 2
+        1: 0
     }
     pict = 255*np.ones(shape=(3, mask.shape[1], mask.shape[2]), dtype=np.uint8)
     for i in range(1, 6):
@@ -68,11 +85,21 @@ def picture_from_mask(mask, threshold=0):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', 
+                        type=str,
+                        action= CheckExt({'tif', 'tiff'}),
+                        help='Input raster')
+    opt = parser.parse_args()
+    print(opt)
+    
+    
     model = get_model()
     model.load_weights(weights_path)
-    test_id = 'test'
-    img = normalize(tiff.imread('data/mband/{}.tif'.format(test_id)).transpose([1,2,0]))   # make channels last
-
+    # test_id = 'test'
+    # img = normalize(tiff.imread('data/mband/{}.tif'.format(test_id)).transpose([1,2,0]))   # make channels last
+    img = normalize(tiff.imread('{}'.format(opt.input)).transpose([1,2,0]))
+    
     for i in range(7):
         if i == 0:  # reverse first dimension
             mymat = predict(img[::-1,:,:], model, patch_sz=PATCH_SZ, n_classes=N_CLASSES).transpose([2,0,1])
