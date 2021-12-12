@@ -51,19 +51,19 @@ if __name__ == '__main__':
                         default='./data/gt_mband',
                         help='Folder directory for mask images')
     parser.add_argument('-e','--epochs', 
-                        type=str,
+                        type=int,
                         default=200,
                         help='Epoch to run training network')
     parser.add_argument('-b','--batch', 
-                        type=str,
+                        type=int,
                         default=32,
                         help='Batch size for training network')
     parser.add_argument('--trainsize', 
-                        type=str,
+                        type=int,
                         default=4000,
                         help='Batch size for training network')
     parser.add_argument('--validsize', 
-                        type=str,
+                        type=int,
                         default=1000,
                         help='Batch size for training network')
     opt = parser.parse_args()
