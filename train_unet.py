@@ -24,8 +24,8 @@ N_CLASSES = 5  # buildings, roads, trees, crops and water
 CLASS_WEIGHTS = [0.2, 0.3, 0.1, 0.1, 0.3]
 UPCONV = True
 PATCH_SZ = 160   # should divide by 16
-TRAIN_SZ = 4000  # train size 4000
-VAL_SZ = 1000    # validation size 2000
+# TRAIN_SZ = 800  # train size 4000
+# VAL_SZ = 250    # validation size 2000
 
 
 def get_model():
@@ -58,11 +58,21 @@ if __name__ == '__main__':
                         type=str,
                         default=32,
                         help='Batch size for training network')
+    parser.add_argument('--trainsize', 
+                        type=str,
+                        default=4000,
+                        help='Batch size for training network')
+    parser.add_argument('--validsize', 
+                        type=str,
+                        default=1000,
+                        help='Batch size for training network')
     opt = parser.parse_args()
     print(opt)
     
     N_EPOCHS = opt.epochs
     BATCH_SIZE = opt.batch
+    TRAIN_SZ = opt.trainsize  # train size 4000
+    VAL_SZ = opt.validsize    # validation size 2000
     
     X_DICT_TRAIN = dict()
     Y_DICT_TRAIN = dict()
@@ -85,7 +95,7 @@ if __name__ == '__main__':
         print("[INFO] Start train UNET")
         x_train, y_train = get_patches(X_DICT_TRAIN, Y_DICT_TRAIN, n_patches=TRAIN_SZ, sz=PATCH_SZ)
         x_val, y_val = get_patches(X_DICT_VALIDATION, Y_DICT_VALIDATION, n_patches=VAL_SZ, sz=PATCH_SZ)
-        K.clear_session()
+        # K.clear_session()
         model = get_model()
         if os.path.isfile(weights_path):
             model.load_weights(weights_path)
@@ -100,5 +110,6 @@ if __name__ == '__main__':
                   callbacks=[model_checkpoint, csv_logger], #callbacks=[model_checkpoint, csv_logger, tensorboard],
                   validation_data=(x_val, y_val))
         return model
-
+    
+    K.clear_session()
     train_net()
