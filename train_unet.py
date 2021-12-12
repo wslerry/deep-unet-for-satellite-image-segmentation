@@ -4,9 +4,9 @@ from gen_patches import *
 import os.path
 import numpy as np
 import tifffile as tiff
-from keras.callbacks import CSVLogger
-from keras.callbacks import TensorBoard
-from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.callbacks import CSVLogger
+from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 
 def normalize(img):
@@ -70,10 +70,10 @@ if __name__ == '__main__':
         #reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=5, min_lr=0.00001)
         model_checkpoint = ModelCheckpoint(weights_path, monitor='val_loss', save_best_only=True)
         csv_logger = CSVLogger('log_unet.csv', append=True, separator=';')
-        tensorboard = TensorBoard(log_dir='./tensorboard_unet/', write_graph=True, write_images=True)
+        # tensorboard = TensorBoard(log_dir='./tensorboard_unet/', write_graph=True, write_images=True)
         model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=N_EPOCHS,
                   verbose=2, shuffle=True,
-                  callbacks=[model_checkpoint, csv_logger, tensorboard],
+                  callbacks=[model_checkpoint, csv_logger], #callbacks=[model_checkpoint, csv_logger, tensorboard],
                   validation_data=(x_val, y_val))
         return model
 
