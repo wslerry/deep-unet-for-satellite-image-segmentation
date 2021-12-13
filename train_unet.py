@@ -23,7 +23,7 @@ N_BANDS = 8
 N_CLASSES = 5  # buildings, roads, trees, crops and water
 CLASS_WEIGHTS = [0.2, 0.3, 0.1, 0.1, 0.3]
 UPCONV = True
-PATCH_SZ = 160   # should divide by 16
+PATCH_SZ = 480   # should divide by 16
 # TRAIN_SZ = 800  # train size 4000
 # VAL_SZ = 250    # validation size 2000
 
