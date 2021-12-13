@@ -1,7 +1,10 @@
 # u-net model with up-convolution or up-sampling and weighted binary-crossentropy as loss func
 
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Conv2DTranspose, BatchNormalization, Dropout
+from tensorflow.keras.layers import (Input, Conv2D, MaxPooling2D, 
+                                     UpSampling2D, concatenate, Conv2DTranspose, 
+                                     BatchNormalization, Dropout, Activation,
+                                     SeparableConv2D, add)
 from tensorflow.keras.optimizers import Adam #edit to old keras
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras import backend as K
@@ -107,4 +110,69 @@ def unet_model(n_classes=5, im_sz=160, n_channels=8, n_filters_start=32, growth_
         return K.sum(class_loglosses * K.constant(class_weights))
 
     model.compile(optimizer=Adam(), loss=weighted_binary_crossentropy)
+    return model
+
+
+def unets_Xception_model(n_classes=5, im_sz=160, n_channels=8, class_weights=[0.2, 0.3, 0.1, 0.1, 0.3]):
+    # inputs = Input(shape=img_size + (img_channels,))
+    inputs = Input((im_sz, im_sz, n_channels))
+
+    ### [first half of the network: downsampling inputs]
+
+    # entry block
+    x = Conv2D(32, 3, strides=2, padding="same")(inputs)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+
+    previous_block_activation = x # set aside residual
+
+    # Blocks 1, 2, 3 are idetical apart from the feature depth
+    for filters in [64, 128, 256]:
+        x = Activation("relu")(x)
+        x = SeparableConv2D(filters, 3, padding="same")(x)
+        x = BatchNormalization()(x)
+
+        x = Activation("relu")(x)
+        x = SeparableConv2D(filters, 3, padding="same")(x)
+        x = BatchNormalization()(x)
+
+        x = MaxPooling2D(3, strides=2, padding="same")(x)
+
+        # residual
+        residual = Conv2D(filters, 1, strides=2, padding="same")(
+            previous_block_activation
+        )
+        x = add([x, residual])
+        previous_block_activation = x # set aside residual
+
+    ### [second half of the network: upsampling]
+
+    for filters in [256, 128, 64, 32]:
+        x = Activation("relu")(x)
+        x = Conv2DTranspose(filters, 3, padding="same")(x)
+        x = BatchNormalization()(x)
+
+        x = Activation("relu")(x)
+        x = Conv2DTranspose(filters, 3, padding="same")(x)
+        x = BatchNormalization()(x)
+
+        x = UpSampling2D(2)(x)
+
+        # residual
+        residual = UpSampling2D(2)(previous_block_activation)
+        residual = Conv2D(filters, 1, padding="same")(residual)
+        x = add([x, residual])  # Add back residual
+        previous_block_activation = x  # Set aside next residual
+
+    # Add a per-pixel classification layer
+    outputs = Conv2D(n_classes, 3, activation="softmax", padding="same")(x)
+    # Define the model
+    model = Model(inputs, outputs)
+    
+    def weighted_binary_crossentropy(y_true, y_pred):
+        class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
+        return K.sum(class_loglosses * K.constant(class_weights))
+
+    model.compile(optimizer=Adam(), loss=weighted_binary_crossentropy)
+
     return model

@@ -29,13 +29,14 @@ PATCH_SZ = 160   # should divide by 16
 
 
 def get_model():
-    return unet_model(N_CLASSES, PATCH_SZ, n_channels=N_BANDS, upconv=UPCONV, class_weights=CLASS_WEIGHTS)
+    return unets_Xception_model(N_CLASSES, PATCH_SZ, n_channels=N_BANDS, class_weights=CLASS_WEIGHTS)
+    # return unet_model(N_CLASSES, PATCH_SZ, n_channels=N_BANDS, upconv=UPCONV, class_weights=CLASS_WEIGHTS)
 
 
 weights_path = 'weights'
 if not os.path.exists(weights_path):
     os.makedirs(weights_path)
-weights_path += '/unet_weights.hdf5'
+weights_path += '/unet_xceptions_best.hdf5'
 
 trainIds = [str(i).zfill(2) for i in range(1, 25)]  # all availiable ids: from "01" to "24"
 
@@ -109,6 +110,7 @@ if __name__ == '__main__':
                   verbose=2, shuffle=True,
                   callbacks=[model_checkpoint, csv_logger], #callbacks=[model_checkpoint, csv_logger, tensorboard],
                   validation_data=(x_val, y_val))
+        
         return model
     
     K.clear_session()
