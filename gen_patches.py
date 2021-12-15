@@ -8,7 +8,9 @@ def get_rand_patch(img, mask, sz=160):
     :param sz: size of random patch
     :return: patch with shape (sz, sz, num_channels)
     """
+    print(f'check:\n\timg_shape: {img.shape}, mask_shape:{mask.shape}')
     assert len(img.shape) == 3 and img.shape[0] > sz and img.shape[1] > sz and img.shape[0:2] == mask.shape[0:2]
+    
     xc = random.randint(0, img.shape[0] - sz)
     yc = random.randint(0, img.shape[1] - sz)
     patch_img = img[xc:(xc + sz), yc:(yc + sz)]
@@ -47,7 +49,9 @@ def get_patches(x_dict, y_dict, n_patches, sz=160):
     while total_patches < n_patches:
         img_id = random.sample(x_dict.keys(), 1)[0]
         img = x_dict[img_id]
+        print('img patch size: '+img.shape)
         mask = y_dict[img_id]
+        print('mask patch size: '+mask.shape)
         img_patch, mask_patch = get_rand_patch(img, mask, sz)
         x.append(img_patch)
         y.append(mask_patch)
