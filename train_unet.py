@@ -19,8 +19,8 @@ def normalize(img):
 
 
 
-N_BANDS = 8
-N_CLASSES = 5  # buildings, roads, trees, crops and water
+N_BANDS = 3
+N_CLASSES = 2  # buildings, roads, trees, crops and water
 CLASS_WEIGHTS = [0.2, 0.3, 0.1, 0.1, 0.3]
 UPCONV = True
 PATCH_SZ = 480   # should divide by 16
@@ -35,7 +35,7 @@ def get_model():
 weights_path = 'weights'
 if not os.path.exists(weights_path):
     os.makedirs(weights_path)
-weights_path += '/unet.h5'
+weights_path += '/unet_lusut_2006.h5'
 
 trainIds = [str(i).zfill(2) for i in range(1, 25)]  # all availiable ids: from "01" to "24"
 

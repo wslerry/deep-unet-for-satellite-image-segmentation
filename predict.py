@@ -61,19 +61,27 @@ def predict(x, model, patch_sz=160, n_classes=5):
 
 def picture_from_mask(mask, threshold=0):
     colors = {
-        0: [150, 150, 150],  # Buildings
-        1: [223, 194, 125],  # Roads & Tracks
-        2: [27, 120, 55],    # Trees
-        3: [166, 219, 160],  # Crops
-        4: [116, 173, 209]   # Water
+        0: [166, 219, 160],  # Unclassified
+        1: [150, 150, 150],  # Buildings
     }
     z_order = {
-        1: 3,
-        2: 4,
-        3: 0,
-        4: 1,
-        5: 2
+        1: 0,
+        2: 1
     }
+    # colors = {
+    #     0: [150, 150, 150],  # Buildings
+    #     1: [223, 194, 125],  # Roads & Tracks
+    #     2: [27, 120, 55],    # Trees
+    #     3: [166, 219, 160],  # Crops
+    #     4: [116, 173, 209]   # Water
+    # }
+    # z_order = {
+    #     1: 3,
+    #     2: 4,
+    #     3: 0,
+    #     4: 1,
+    #     5: 2
+    # }
 
     pict = 255*np.ones(shape=(3, mask.shape[1], mask.shape[2]), dtype=np.uint8)
     for i in range(1, 6):
