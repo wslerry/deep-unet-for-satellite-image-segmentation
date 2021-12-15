@@ -38,7 +38,7 @@ if not os.path.exists(weights_path):
 weights_path += '/unet_lusut_2006.h5'
 
 # trainIds = [str(i).zfill(2) for i in range(1, 25)]  # all availiable ids: from "01" to "24"
-trainIds = [str(i).zfill(1) for i in range(1, 57)] 
+trainIds = [str(i).zfill(1) for i in range(1, 21)] 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
