@@ -8,8 +8,9 @@ def get_rand_patch(img, mask, sz=160):
     :param sz: size of random patch
     :return: patch with shape (sz, sz, num_channels)
     """
-    print(f'check:\n\timg_shape: {str(img.shape)}, mask_shape:{str(mask.shape)}')
-    assert len(img.shape) == 3 and img.shape[0] > sz and img.shape[1] > sz and img.shape[0:2] == mask.shape[0:2]
+    # print(f'check:\n\timg_shape: {str(img.shape)}, mask_shape:{str(mask.shape)}')
+    # assert len(img.shape) == 3 and img.shape[0] > sz and img.shape[1] > sz and img.shape[0:2] == mask.shape[0:2]
+    assert len(img.shape) == 3 and img.shape[0:2] == mask.shape[0:2]
     
     xc = random.randint(0, img.shape[0] - sz)
     yc = random.randint(0, img.shape[1] - sz)
