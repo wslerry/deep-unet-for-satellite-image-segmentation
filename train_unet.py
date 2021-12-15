@@ -37,18 +37,18 @@ if not os.path.exists(weights_path):
     os.makedirs(weights_path)
 weights_path += '/unet_lusut_2006.h5'
 
-trainIds = [str(i).zfill(2) for i in range(1, 25)]  # all availiable ids: from "01" to "24"
-
+# trainIds = [str(i).zfill(2) for i in range(1, 25)]  # all availiable ids: from "01" to "24"
+trainIds = [str(i).zfill(1) for i in range(1, 57)] 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--images', 
                         type=str,
-                        default='./data/mband',
+                        default='./data_02/mband',
                         help='Folder directory for train images')
     parser.add_argument('--mask', 
                         type=str,
-                        default='./data/gt_mband',
+                        default='./data_02/gt_mband',
                         help='Folder directory for mask images')
     parser.add_argument('-e','--epochs', 
                         type=int,
@@ -81,8 +81,8 @@ if __name__ == '__main__':
 
     print('[INFO] Reading images')
     for img_id in trainIds:
-        img_m = normalize(tiff.imread('{}/{}.tif'.format(opt.images,img_id)).transpose([1, 2, 0]))
-        mask = tiff.imread('{}/{}.tif'.format(opt.mask,img_id)).transpose([1, 2, 0]) / 255
+        img_m = normalize(tiff.imread('{}/LUSUT_2006_{}.tif'.format(opt.images,img_id)).transpose([1, 2, 0]))
+        mask = tiff.imread('{}/LUSUT_2006_{}.tif'.format(opt.mask,img_id)).transpose([1, 2, 0]) / 255
         train_xsz = int(3/4 * img_m.shape[0])  # use 75% of image as train and 25% for validation
         X_DICT_TRAIN[img_id] = img_m[:train_xsz, :, :]
         Y_DICT_TRAIN[img_id] = mask[:train_xsz, :, :]
